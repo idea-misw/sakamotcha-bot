@@ -2,3 +2,9 @@ __pycache__/
 
 sakamo_corpus.json
 temp_data.pickle
+
+misc/*_data.tsv
+
+misc/train.tsv
+misc/dev.tsv
+misc/test.tsv
