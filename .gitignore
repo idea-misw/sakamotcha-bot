@@ -3,6 +3,8 @@ __pycache__/
 sakamo_corpus.json
 temp_data.pickle
 
+data/sakamoto_bert/
+
 misc/*_data.tsv
 
 misc/train.tsv
