@@ -1,17 +1,22 @@
 import json
 from pathlib import Path
 
-corpus_p = Path(__file__).resolve().parents[1] / 'data' / 'sakamo_corpus.json'
-with corpus_p.open('r') as f:
+p = Path(__file__).resolve().parents[1] / 'data' / 'sakamo_corpus.json'
+with p.open(encoding='utf-8') as f:
     corpus = json.load(f)
 
-is_symbol = lambda c: (
-    not '0' <= c <= '9'  # digits
-    and not ('A' <= c <= 'Z' or 'a' <= c <= 'z')  # latin
-    and not ('ぁ' <= c <= 'ゖ' or 'ァ' <= c <= 'ヺ')  # kana
-    and not int('4e00', 16) <= ord(c) <= int('9FFF', 16)  # kanji
-    and not 'ｦ' <= c <= 'ﾝ'  # halfwidth katakana
-)
+def is_symbol(char):
+    if '0' <= char <= '9':                               # digits
+        return False
+    if 'A' <= char <= 'Z' or 'a' <= char <= 'z':         # latin
+        return False
+    if 'ぁ' <= char <= 'ゖ' or 'ァ' <= char <= 'ヺ':      # kana
+        return False
+    if int('4e00', 16) <= ord(char) <= int('9FFF', 16):  # kanji
+        return False
+    if 'ｦ' <= char <= 'ﾝ':                               # halfwidth katakana
+        return False
+    return True
 
 symbol_set = set()
 for text in corpus:

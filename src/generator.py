@@ -2,51 +2,50 @@ import pickle
 import random
 from pathlib import Path
 
-from analyzer import Analyzer
+from tokenizer import Tokenizer
 
 
 class Generator:
     def __init__(self, ngram_size=3):
         self.ngram_size = ngram_size
 
+        self.originals = []
         self.chain = {}
-        self.init_prefix_list = []
-        self.original_list = []
         
-        self.analyzer = Analyzer()
+        self.tokenizer = Tokenizer()
 
         self.trial_num = 1000
         self.max_result_len = 280
         self.error_message = 'ﾀｽｹﾃｰｯｯ'
-        self.symbol_list = [
-            ('"', '"'), ("'", "'"), ('(', ')'),
-            ('「', '」'), ('『', '』'), ('【', '】'),
+        self.pair_symbols = [
+            ('"', '"'),
+            ("'", "'"),
+            ('(', ')'),
+            ('「', '」'),
+            ('『', '』'),
+            ('【', '】'),
             ('｢', '｣')
         ]
+        self.sos_symbol = 'SOS'
+        self.eos_symbol = 'EOS'
 
-        self.dump_file = 'dumped_data.pickle'
+        self.dump_path = 'dumped_data.pickle'
     
-    def load(self, file=None):
-        load_p = Path(self.dump_file if file is None else file)
+    def load(self, file_path=None):
+        load_p = Path(self.dump_path if file_path is None else file_path)
         with load_p.open('rb') as f:
             load_data = pickle.load(f)
 
-        (
-            self.ngram_size,
-            self.chain,
-            self.init_prefix_list,
-            self.original_list
-        ) = load_data
+        self.ngram_size, self.original_list, self.chain = load_data
 
-    def dump(self, file=None):
+    def dump(self, file_path=None):
         dump_data = (
             self.ngram_size,
-            self.chain,
-            self.init_prefix_list,
-            self.original_list
+            self.originals,
+            self.chain
         )
 
-        dump_p = Path(self.dump_file if file is None else file)
+        dump_p = Path(self.dump_path if file_path is None else file_path)
         with dump_p.open('wb') as f:
             pickle.dump(dump_data, f)
 
@@ -62,7 +61,7 @@ class Generator:
     def validate_symbol(self, line):
         symbol_stack = []
         for char in line:
-            for l_symbol, r_symbol in self.symbol_list:
+            for l_symbol, r_symbol in self.pair_symbols:
                 if char == l_symbol:
                     symbol_stack.append(l_symbol)
                 if char == r_symbol:
@@ -75,44 +74,53 @@ class Generator:
             return False
         return True
 
-    def learn(self, sentence):
-        self.original_list.append(sentence)
+    def learn(self, text):
+        self.originals.append(text)
 
-        wakati = self.analyzer.analyze(sentence)
-        wakati.append('EOS')
+        sequence = [
+            self.sos_symbol,
+            *self.tokenizer.tokenize(text),
+            self.eos_symbol
+        ]
 
-        for i in range(len(wakati) - self.ngram_size + 1):
-            prefix = tuple(wakati[i:i+self.ngram_size-1])
-            if not i:
-                self.init_prefix_list.append(prefix)        
+        for i in range(len(sequence) - self.ngram_size + 1):
+            prefix = tuple(sequence[i:i+self.ngram_size-1])
             if prefix not in self.chain:
                 self.chain[prefix] = []
-            self.chain[prefix].append(wakati[i+self.ngram_size-1])
+            self.chain[prefix].append(sequence[i+self.ngram_size-1])
+
+    def learns(self, texts):
+        for text in texts:
+            self.learn(text)
 
     def generate(self):
+        start_prefixes = [p for p in self.chain if p[0] == self.sos_symbol]
         for i in range(self.trial_num):
-            prefix = random.choice(self.init_prefix_list)
-            result_list = list(prefix)
+            prefix = random.choice(start_prefixes)
+            sequence = list(prefix[1:])
 
-            midasi = random.choice(self.chain[prefix])
-            while midasi != 'EOS':
-                result_list.append(midasi)
-                prefix = prefix[1:] + (midasi,)
-                midasi = random.choice(self.chain[prefix])
+            token = random.choice(self.chain[prefix])
+            while token != 'EOS':
+                sequence.append(token)
+                prefix = prefix[1:] + (token,)
+                token = random.choice(self.chain[prefix])
 
-            result = ''.join(result_list)
-            if result in self.original_list:
+            text = ''.join(sequence)
+            if text in self.originals:
                 # print('Existing:', result)
                 continue
-            if self.compute_length(result) > self.max_result_len:
+            if self.compute_length(text) > self.max_result_len:
                 # print('Length over:', result)
                 continue
-            if not self.validate_symbol(result):
+            if not self.validate_symbol(text):
                 # print('Symbol invalid:', result)
                 continue
-            return result
+            return text
         
         return self.error_message
+    
+    def generates(self, gen_num=100):
+        return [self.generate() for i in range(gen_num)]
 
 
 if __name__ == '__main__':

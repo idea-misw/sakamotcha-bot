@@ -5,20 +5,18 @@ sys.path.append(str(Path(__file__).resolve().parents[1] / 'src'))
 import json
 from generator import Generator
 
-corpus_p = Path(__file__).resolve().parents[1] / 'data' / 'sakamo_corpus.json'
-with corpus_p.open('r') as f:
+p = Path(__file__).resolve().parents[1] / 'data' / 'sakamo_corpus.json'
+with p.open(encoding='utf-8') as f:
     corpus = json.load(f)
 
 g = Generator()
+g.learns(corpus)
 
-for text in corpus:
-    g.learn(text)
+q = Path(__file__).resolve().parent / 'temp_data.pickle'
+g.dump(q)
 
-dump_p = Path(__file__).resolve().parent / 'temp_data.pickle'
-g.dump(dump_p)
+h = Generator()  # another instance
+h.load(q)
 
-g = Generator()  # another instance
-g.load(dump_p)
-
-for i in range(10):
-    print(g.generate())
+for text in h.generates(10):
+    print(text)
