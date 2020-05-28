@@ -4,7 +4,6 @@ half2full = str.maketrans(
     '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ ',
     '０１２３４５６７８９ａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ！”＃＄％＆’（）＊＋，－．／：；＜＝＞？＠［＼］＾＿‘｛｜｝～　'
 )
-
 jumanpp = Juman()
 
 classes = [
@@ -15,6 +14,7 @@ dev_freq = 10
 
 train_data = []
 dev_data = []
+
 for i, class_ in enumerate(classes):
     tsv_path = class_ + '_data.tsv'
     with open(tsv_path, 'r') as f:
@@ -23,13 +23,13 @@ for i, class_ in enumerate(classes):
             full_text = text.translate(half2full)
 
             result = jumanpp.analysis(full_text)
-            wakati_text = ' '.join(mrph.midasi for mrph in result.mrph_list())
+            sequence = ' '.join(mrph.midasi for mrph in result.mrph_list())
 
             cola_row = (
                 id_str,
                 str(i),
                 '' if i else '*',
-                wakati_text
+                sequence
             )
 
             if j % dev_freq:
