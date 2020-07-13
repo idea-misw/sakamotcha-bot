@@ -10,3 +10,7 @@ misc/*_data.tsv
 misc/train.tsv
 misc/dev.tsv
 misc/test.tsv
+
+twitter/.env
+twitter/*.csv
+twitter/*.json
