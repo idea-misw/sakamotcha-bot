@@ -1,13 +1,15 @@
+import os
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parents[1] / 'src'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'generator'))
 
-import json
+import csv
 from generator import Generator
 
-p = Path(__file__).resolve().parents[1] / 'data' / 'sakamo_corpus.json'
-with p.open(encoding='utf-8') as f:
-    corpus = json.load(f)
+csv_path = os.path.join(
+    os.path.dirname(__file__), '..', 'twitter', 'texts.csv'
+)
+with open(csv_path, encoding='utf-8', newline='') as f:
+    corpus = [row[0] for row in csv.reader(f)]
 
 g = Generator()
 

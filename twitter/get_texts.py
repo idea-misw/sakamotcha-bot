@@ -16,6 +16,9 @@ with open('user_timeline.json', encoding='utf-8') as f:
             if '@' not in text:
                 texts.append(text)
 
+texts.reverse()
+
 with open('texts.csv', 'w', encoding='utf-8', newline='') as f:
     writer = csv.writer(f)
-    writer.writerow(list(reversed(texts))[:output_len])
+    for text in texts[:output_len]:
+        writer.writerow([text])

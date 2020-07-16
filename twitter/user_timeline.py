@@ -6,7 +6,7 @@ from settings import (
     CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET
 )
 
-user_timelines = []
+full_user_timelines = []
 status_sum = 0
 
 oauth = OAuth1Session(
@@ -31,7 +31,7 @@ while True:
         break
     print('get {} statuses'.format(status_num))
 
-    user_timelines += user_timeline
+    full_user_timelines += user_timeline
     status_sum += status_num
 
     max_id = user_timeline[-1]['id'] - 1
@@ -42,4 +42,4 @@ while True:
 print('\nget {} statuses in total'.format(status_sum))
 
 with open('user_timeline.json', 'w', encoding='utf-8') as f:
-    json.dump(user_timelines, f, separators=(',', ':'))
+    json.dump(full_user_timelines, f, separators=(',', ':'))
