@@ -9,7 +9,7 @@ Sakamoto Tweet Generator (サカモトツイートジェネレータ) generates 
     >>> from generator import Generator
     >>> g = Generator()
     >>> g.load()  # load the model
-    data successfully loaded
+    successfully loaded
     >>> g.generate()
     'ざむちゃんが1000人'
 
