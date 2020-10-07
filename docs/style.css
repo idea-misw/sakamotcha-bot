@@ -233,6 +233,10 @@ li {
     width: 256px;
 }
 
+.internal__link {
+    text-decoration: underline;
+}
+
 .external__list {
     display: flex;
     justify-content: center;
