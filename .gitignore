@@ -1,15 +1,5 @@
 __pycache__/
 
-sakamo_corpus.json
-
-data/sakamoto_bert/
-
-misc/*_data.tsv
-
-misc/train.tsv
-misc/dev.tsv
-misc/test.tsv
-
 test/*.pickle
 
 twitter/.env
